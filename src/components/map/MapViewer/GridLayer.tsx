@@ -14,7 +14,7 @@ export const GridLayer: Component<{
     onCellClick?: (cell: { row: number; col: number }) => void;
     onOptionsUpdate?: (options: NonNullable<MapUpdate['layerOptions']>['grid']) => void;
 }> = props => {
-    const context = useMapViewerContext('Grid');
+    const context = useMapViewerContext('Grid', { shortcut: 'g' });
 
     const options = createMemo(() => props.map?.layerOptions?.grid);
 

@@ -3,7 +3,9 @@ import { createStore } from 'solid-js/store';
 import { isServer } from 'solid-js/web';
 
 export class MapViewerCtx {
-    #store = createStore<{ layer: Map<string, { node: Node }>; activeLayer?: string }>({ layer: new Map() });
+    #store = createStore<{ layer: Map<string, { node: Node; options?: IMapViewContextOptions }>; activeLayer?: string }>({
+        layer: new Map()
+    });
 
     get layer() {
         return this.#store[0].layer;
@@ -21,12 +23,11 @@ export class MapViewerCtx {
         this.#store[1]({ activeLayer: name });
     }
 
-    registerLayer(name: string): void {
+    registerLayer(name: string, options?: IMapViewContextOptions): void {
         if (isServer) return;
-        console.log('register', name);
         this.#store[1](store => ({
             activeLayer: store.activeLayer ?? name,
-            layer: new Map([...store.layer, [name, { node: document.createElement('div') }]])
+            layer: new Map([...store.layer, [name, { node: document.createElement('div'), options }]])
         }));
     }
     unregisterLayer(name: string): void {
@@ -61,15 +62,19 @@ export class NamedMapViewerCtx {
 
 export const MapViewerContext = createContext<MapViewerCtx>();
 
-export function useMapViewerContext(name: string): NamedMapViewerCtx;
+export interface IMapViewContextOptions {
+    shortcut?: string;
+}
+
+export function useMapViewerContext(name: string, options?: IMapViewContextOptions): NamedMapViewerCtx;
 export function useMapViewerContext(): MapViewerCtx;
-export function useMapViewerContext(name?: string): MapViewerCtx | NamedMapViewerCtx {
+export function useMapViewerContext(name?: string, options?: IMapViewContextOptions): MapViewerCtx | NamedMapViewerCtx {
     const ctx = useContext(MapViewerContext);
     if (!ctx) {
         throw new Error('MapViewerContext required');
     }
     if (name) {
-        ctx.registerLayer(name);
+        ctx.registerLayer(name, options);
         onCleanup(() => ctx.unregisterLayer(name));
         return new NamedMapViewerCtx(ctx, name);
     }

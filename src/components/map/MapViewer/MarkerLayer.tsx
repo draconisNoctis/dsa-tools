@@ -58,7 +58,7 @@ const Marker: Component<{
 };
 
 export const MarkerLayer: Component<{ map?: Map; onUpdate?: (update: MapUpdate) => void }> = props => {
-    const context = useMapViewerContext('Marker');
+    const context = useMapViewerContext('Marker', { shortcut: 'm' });
 
     function clickHandler(event: MouseEvent & { currentTarget: HTMLDivElement; target: DOMElement }) {
         if (event.target !== event.currentTarget) return;

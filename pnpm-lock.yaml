@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  tinykeys@3.0.0:
+    hash: m2f4wjypulllt6jbjtreufvifq
+    path: patches/tinykeys@3.0.0.patch
+
 importers:
 
   .:
@@ -44,6 +49,9 @@ importers:
       tailwindcss:
         specifier: ^3.4.3
         version: 3.4.15
+      tinykeys:
+        specifier: 3.0.0
+        version: 3.0.0(patch_hash=m2f4wjypulllt6jbjtreufvifq)
       vinxi:
         specifier: ^0.4.3
         version: 0.4.3(@types/node@22.9.3)(encoding@0.1.13)(ioredis@5.4.1)(terser@5.36.0)(typescript@5.7.2)
@@ -2989,6 +2997,9 @@ packages:
   tinyglobby@0.2.10:
     resolution: {integrity: sha512-Zc+8eJlFMvgatPZTl6A9L/yht8QqdmUNtURHaKZLmKBE12hNPSrqNkUp2cs3M/UKmNVVAMFQYSjYIVHDjW5zew==}
     engines: {node: '>=12.0.0'}
+
+  tinykeys@3.0.0:
+    resolution: {integrity: sha512-nazawuGv5zx6MuDfDY0rmfXjuOGhD5XU2z0GLURQ1nzl0RUe9OuCJq+0u8xxJZINHe+mr7nw8PWYYZ9WhMFujw==}
 
   tinypool@1.0.2:
     resolution: {integrity: sha512-al6n+QEANGFOMf/dmUMsuS5/r9B06uwlyNjZZql/zv8J7ybHCgoihBNORZCY2mzUuAnomQa2JdhyHKzZxPCrFA==}
@@ -6290,6 +6301,8 @@ snapshots:
     dependencies:
       fdir: 6.4.2(picomatch@4.0.2)
       picomatch: 4.0.2
+
+  tinykeys@3.0.0(patch_hash=m2f4wjypulllt6jbjtreufvifq): {}
 
   tinypool@1.0.2: {}
 
