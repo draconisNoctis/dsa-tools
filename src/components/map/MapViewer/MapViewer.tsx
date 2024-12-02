@@ -21,7 +21,7 @@ export const MapViewer: Component<MapViewerProps> = props => {
     const className = createMemo(() => (props.preview ? (screenAspect() > imageAspect() ? 'h-[100vh]' : 'w-[100vw]') : 'w-[100%]'));
 
     return (
-        <div class={` bg-gray-500 w-100% ${props.preview ? 'h-[100vh]' : ''} overflow-hidden`}>
+        <div class={` flex items-center justify-center bg-gray-500 w-100% ${props.preview ? 'h-[100vh]' : ''} overflow-hidden`}>
             <div
                 class={`relative ${className()} bg-cover`}
                 style={{
