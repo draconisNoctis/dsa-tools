@@ -21,7 +21,7 @@ export const MapViewer: Component<MapViewerProps> = props => {
     const className = createMemo(() => (props.preview ? (screenAspect() > imageAspect() ? 'h-[100vh]' : 'w-[100vw]') : 'w-[100%]'));
 
     return (
-        <div class={`flex flex-col items-center justify-center bg-gray-500 w-100% ${props.preview ? 'h-[100vh]' : ''} overflow-hidden`}>
+        <div class={` bg-gray-500 w-100% ${props.preview ? 'h-[100vh]' : ''} overflow-hidden`}>
             <div
                 class={`relative ${className()} bg-cover`}
                 style={{
@@ -39,9 +39,28 @@ export const MapViewer: Component<MapViewerProps> = props => {
                             }
                         });
                     }}
+                    onOptionsUpdate={options => {
+                        props.onUpdate?.({
+                            layerOptions: {
+                                ...props.map?.layerOptions,
+                                grid: { ...props.map?.layerOptions?.grid, ...options }
+                            }
+                        });
+                    }}
                 />
                 <MarkerLayer map={props.map} onUpdate={props.preview ? undefined : props.onUpdate} />
-                <CursorLayer map={props.map} onUpdate={props.preview ? undefined : props.onUpdate} />
+                <CursorLayer
+                    map={props.map}
+                    onUpdate={props.preview ? undefined : props.onUpdate}
+                    onOptionsUpdate={options => {
+                        props.onUpdate?.({
+                            layerOptions: {
+                                ...props.map?.layerOptions,
+                                cursor: { ...props.map?.layerOptions?.cursor, ...options }
+                            }
+                        });
+                    }}
+                />
             </div>
         </div>
     );

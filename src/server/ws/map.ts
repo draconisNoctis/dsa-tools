@@ -32,7 +32,6 @@ export default eventHandler({
             }
         },
         async message(peer, message) {
-            console.info('[WS] message', peer.id);
             const mapId = getIdFromUrl(peer.url);
             try {
                 const event = Event.parse(JSON.parse(message.text()));
@@ -59,7 +58,6 @@ export default eventHandler({
             console.info('[WS] close', peer.id);
             const mapId = getIdFromUrl(peer.url);
             peer.unsubscribe(`map:${mapId}`);
-            // await console.log('[ws map] close', details);
         },
         error(peer, error) {
             console.info('[WS] open', peer.id, error);

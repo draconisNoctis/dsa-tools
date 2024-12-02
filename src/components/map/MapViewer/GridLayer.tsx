@@ -1,51 +1,104 @@
 import { type Component, Index, createMemo } from 'solid-js';
-import type { Map } from '../../../server/databases/map.db';
+import { Portal } from 'solid-js/web';
+import type { Map, MapUpdate } from '../../../server/databases/map.db';
+import { GridOffset } from './GridOffset';
+import { GridSize } from './GridSize';
+import { useMapViewerContext } from './MapViewerContext';
+
+const DEFAULT_GRID_COLOR = '#111827';
+const DEFAULT_OFFSET_COLOR = '#374151';
 
 export const GridLayer: Component<{
     map?: Map;
     preview?: boolean;
     onCellClick?: (cell: { row: number; col: number }) => void;
+    onOptionsUpdate?: (options: NonNullable<MapUpdate['layerOptions']>['grid']) => void;
 }> = props => {
+    const context = useMapViewerContext('Grid');
+
+    const options = createMemo(() => props.map?.layerOptions?.grid);
+
     const cells = createMemo(() =>
-        props.map?.size?.height && props.map?.size?.width
-            ? Array.from({ length: (props.map.size.height + 2) * (props.map.size.width + 2) }, (_, i) => ({
-                  row: ((i / (props.map!.size!.width + 2)) | 0) - 1,
-                  col: (i % (props.map!.size!.width + 2)) - 1
+        options()?.size?.height && options()?.size?.width
+            ? Array.from({ length: (options()!.size!.height + 2) * (options()!.size!.width + 2) }, (_, i) => ({
+                  row: ((i / (options()!.size!.width + 2)) | 0) - 1,
+                  col: (i % (options()!.size!.width + 2)) - 1
               }))
             : []
     );
 
     return (
-        <div
-            class="absolute top-0 left-0 right-0 bottom-[-1px] grid border border-black border-l-0 border-t-0"
-            style={{
-                'grid-template-columns': `${(props.map?.offset?.left ?? 0) * 0.1}% repeat(${props.map?.size?.width ?? 0}, 1fr) ${(props.map?.offset?.right ?? 0) * 0.1}%`,
-                'grid-template-rows': `${(props.map?.offset?.top ?? 0) * 0.1}%repeat(${props.map?.size?.height ?? 0}, 1fr) ${(props.map?.offset?.bottom ?? 0) * 0.1}%`
-            }}>
-            <Index each={cells()}>
-                {cell => {
-                    const isOffset = createMemo(
-                        () =>
-                            cell().row === -1 ||
-                            cell().col === -1 ||
-                            cell().row === props.map?.size?.height ||
-                            cell().col === props.map?.size?.width
-                    );
-                    const isOpened = createMemo(() => !!props.map?.cells?.[`${cell().row}:${cell().col}`]);
-                    return (
-                        <div
-                            class="border border-black border-r-0 border-b-0"
-                            classList={{
-                                'bg-gray-900': !isOpened() && !isOffset() && props.preview,
-                                'bg-gray-900/90': !isOpened() && !isOffset() && !props.preview,
-                                'bg-gray-700': isOffset() && props.preview,
-                                'bg-gray-700/90': isOffset() && !props.preview
-                            }}
-                            onClick={isOffset() ? undefined : () => props.onCellClick?.(cell())}
-                        />
-                    );
-                }}
-            </Index>
-        </div>
+        <>
+            <Portal mount={context.getPortal()}>
+                <div class="grid grid-cols-[1fr_min-content_max-content] gap-1 p-1">
+                    <label for="grid-grid-color">Grid Color</label>
+                    <button
+                        type="button"
+                        onClick={() => props.onOptionsUpdate?.({ gridColor: DEFAULT_GRID_COLOR })}
+                        title="Reset to default">
+                        ⟳
+                    </button>
+                    <input
+                        type="color"
+                        id="grid-grid-color"
+                        value={options()?.gridColor ?? DEFAULT_GRID_COLOR}
+                        onInput={e => props.onOptionsUpdate?.({ gridColor: e.target.value })}
+                    />
+                    <label for="grid-offset-color">Offset Color</label>
+                    <button
+                        type="button"
+                        onClick={() => props.onOptionsUpdate?.({ offsetColor: DEFAULT_OFFSET_COLOR })}
+                        title="Reset to default">
+                        ⟳
+                    </button>
+                    <input
+                        type="color"
+                        id="grid-offset-color"
+                        value={options()?.offsetColor ?? DEFAULT_OFFSET_COLOR}
+                        onInput={e => props.onOptionsUpdate?.({ offsetColor: e.target.value })}
+                    />
+                    <label class="col-span-3 font-bold">Size</label>
+                    <GridSize size={options()?.size} onUpdate={size => props.onOptionsUpdate?.({ size })} />
+                    <label class="col-span-3 font-bold">Offset</label>
+                    <div class="col-span-3">
+                        <GridOffset offset={options()?.offset} onUpdate={offset => props.onOptionsUpdate?.({ offset })} />
+                    </div>
+                </div>
+            </Portal>
+            <div
+                class="absolute top-0 left-0 right-0 bottom-[-1px] grid border border-black border-l-0 border-t-0"
+                classList={{ 'pointer-events-none': !context.isActive() }}
+                style={{
+                    'grid-template-columns': `${(options()?.offset?.left ?? 0) * 0.1}% repeat(${options()?.size?.width ?? 0}, 1fr) ${(options()?.offset?.right ?? 0) * 0.1}%`,
+                    'grid-template-rows': `${(options()?.offset?.top ?? 0) * 0.1}%repeat(${options()?.size?.height ?? 0}, 1fr) ${(options()?.offset?.bottom ?? 0) * 0.1}%`
+                }}>
+                <Index each={cells()}>
+                    {cell => {
+                        const isOffset = createMemo(
+                            () =>
+                                cell().row === -1 ||
+                                cell().col === -1 ||
+                                cell().row === options()?.size?.height ||
+                                cell().col === options()?.size?.width
+                        );
+                        const isOpened = createMemo(() => !!props.map?.cells?.[`${cell().row}:${cell().col}`]);
+                        return (
+                            <div
+                                class="border border-black border-r-0 border-b-0"
+                                style={{
+                                    '--grid-color': `${options()?.gridColor ?? DEFAULT_GRID_COLOR}${props.preview ? '' : 'E6'}`,
+                                    '--offset-color': `${options()?.offsetColor ?? DEFAULT_OFFSET_COLOR}${props.preview ? '' : 'E6'}`
+                                }}
+                                classList={{
+                                    'bg-[var(--grid-color)]': !isOpened() && !isOffset(),
+                                    'bg-[var(--offset-color)]': isOffset()
+                                }}
+                                onClick={isOffset() ? undefined : () => props.onCellClick?.(cell())}
+                            />
+                        );
+                    }}
+                </Index>
+            </div>
+        </>
     );
 };

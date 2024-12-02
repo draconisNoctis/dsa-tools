@@ -1,20 +1,22 @@
 .Cursor {
-  container-name: Cursor;
-  pointer-events: none;
+    container-name: Cursor;
+    pointer-events: none;
 }
 
 @container style(--cursor: true) {
-  .Cursor::before {
-    content: "";
-    display: block;
-    background: #00ffffaa;
-    height: 2px;
-    width: 2px;
-    box-shadow: 0 0 10px 8px #00ffffaa;
-    border-radius: 50%;
-    position: absolute;
-    left: var(--cursor-x);
-    top: var(--cursor-y);
-    transform: translate(-50%, -50%);
-  }
+    .Cursor::before {
+        content: '';
+        display: block;
+        background: #00ffffaa;
+        background: color-mix(in srgb, var(--cursor-color), transparent 30%);
+        height: calc(var(--cursor-size) / 2 * 0.05vw);
+        width: calc(var(--cursor-size) / 2 * 0.05vw);
+        box-shadow: 0 0 calc(var(--cursor-size) / 1 * 0.05vw) calc(var(--cursor-size) / 2 * 0.05vw)
+            color-mix(in srgb, var(--cursor-color), transparent 30%);
+        border-radius: 50%;
+        position: absolute;
+        left: var(--cursor-x);
+        top: var(--cursor-y);
+        transform: translate(-50%, -50%);
+    }
 }

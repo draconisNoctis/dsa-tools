@@ -26,25 +26,13 @@
     }
 
     & input[type='text'] {
-        width: 10rem;
+        /* width: 10rem; */
     }
 }
 
 .MarkerReverse {
     flex-direction: row-reverse;
     transform: translate(calc(-100% + 0.5em), -50%);
-}
-
-.MarkerEditing {
-    border-color: currentColor;
-    background: white;
-    opacity: 1;
-    padding: 4px;
-    transform: translate(calc(-0.5em - 4px), -50%);
-    pointer-events: auto;
-    &.MarkerReverse {
-      transform: translate(calc(-100% + 0.5em + 4px), -50%);
-  }
 }
 
 .MarkerDot {
@@ -68,6 +56,7 @@
         background: white;
         opacity: 1;
         padding: 4px;
+        gap: 0;
         transform: translate(calc(-0.5em - 4px), -50%);
         &.MarkerReverse {
             transform: translate(calc(-100% + 0.5em + 4px), -50%);

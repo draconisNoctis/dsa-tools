@@ -8,22 +8,6 @@ export const MapDb = new NoDb(
     z.object({
         name: z.string(),
         imageId: z.string().nullable().optional(),
-        offset: z
-            .object({
-                top: z.number(),
-                left: z.number(),
-                right: z.number(),
-                bottom: z.number()
-            })
-            .nullable()
-            .optional(),
-        size: z
-            .object({
-                width: z.number(),
-                height: z.number()
-            })
-            .nullable()
-            .optional(),
         cells: z.record(z.string(), z.boolean().nullable().optional()).nullable().optional(),
         cursor: z
             .object({
@@ -44,6 +28,41 @@ export const MapDb = new NoDb(
                     text: z.string()
                 })
             )
+            .nullable()
+            .optional(),
+        layerOptions: z
+            .object({
+                grid: z
+                    .object({
+                        gridColor: z.string().nullable().optional(),
+                        offsetColor: z.string().nullable().optional(),
+                        offset: z
+                            .object({
+                                top: z.number(),
+                                left: z.number(),
+                                right: z.number(),
+                                bottom: z.number()
+                            })
+                            .nullable()
+                            .optional(),
+                        size: z
+                            .object({
+                                width: z.number(),
+                                height: z.number()
+                            })
+                            .nullable()
+                            .optional()
+                    })
+                    .nullable()
+                    .optional(),
+                cursor: z
+                    .object({
+                        color: z.string().nullable().optional(),
+                        size: z.number().nullable().optional()
+                    })
+                    .nullable()
+                    .optional()
+            })
             .nullable()
             .optional()
     })

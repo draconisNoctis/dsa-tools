@@ -1,5 +1,6 @@
 import { useParams } from '@solidjs/router';
 import { MapViewer } from '~/components/map/MapViewer/MapViewer';
+import { MapViewerContext, MapViewerCtx } from '~/components/map/MapViewer/MapViewerContext';
 import { useWebSocket } from '~/hooks/useWebSocket';
 import type { Map } from '../../../server/databases/map.db';
 import type { Event } from '../../../server/ws/map';
@@ -16,9 +17,13 @@ export default function MapPreview() {
         }
     });
 
+    const context = new MapViewerCtx();
+
     return (
         <main>
-            <MapViewer map={map} preview />
+            <MapViewerContext.Provider value={context}>
+                <MapViewer map={map} preview />
+            </MapViewerContext.Provider>
         </main>
     );
 }
