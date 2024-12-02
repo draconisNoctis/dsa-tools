@@ -1,0 +1,20 @@
+.Cursor {
+  container-name: Cursor;
+  pointer-events: none;
+}
+
+@container style(--cursor: true) {
+  .Cursor::before {
+    content: "";
+    display: block;
+    background: #00ffffaa;
+    height: 2px;
+    width: 2px;
+    box-shadow: 0 0 10px 8px #00ffffaa;
+    border-radius: 50%;
+    position: absolute;
+    left: var(--cursor-x);
+    top: var(--cursor-y);
+    transform: translate(-50%, -50%);
+  }
+}

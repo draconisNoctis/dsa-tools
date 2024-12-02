@@ -1,93 +1,94 @@
 {
-    "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-    "css": {
-        "formatter": {
-            "enabled": false
-        },
-        "linter": {
-            "enabled": false
-        },
-        "parser": {
-            "cssModules": true
-        }
-    },
-    "files": {
-        "ignore": [
-            "**/*.js",
-            "**/*.mjs",
-            "**/*.cjs",
-            "**/*.d.ts",
-            "**/.output/**",
-            "**/.vinxi/**"
-        ],
-        "maxSize": 2097152
-    },
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "css": {
     "formatter": {
-        "enabled": true,
-        "indentStyle": "space",
-        "indentWidth": 4,
-        "lineEnding": "lf",
-        "lineWidth": 140
-    },
-    "javascript": {
-        "formatter": {
-            "arrowParentheses": "asNeeded",
-            "bracketSameLine": true,
-            "quoteProperties": "asNeeded",
-            "quoteStyle": "single",
-            "trailingCommas": "none"
-        },
-        "parser": {
-            "unsafeParameterDecoratorsEnabled": true
-        }
-    },
-    "json": {
-        "formatter": {
-            "indentStyle": "space"
-        },
-        "parser": {
-            "allowComments": true
-        }
+      "enabled": false
     },
     "linter": {
-        "enabled": true,
-        "rules": {
-            "recommended": true,
-            "complexity": {
-                "noBannedTypes": "warn",
-                "noForEach": "warn",
-                "noUselessSwitchCase": "off"
-            },
-            "correctness": {
-                "noUnusedImports": "error",
-                "noUnusedVariables": "error"
-            },
-            "style": {
-                "noInferrableTypes": "warn",
-                "noNamespace": "off",
-                "noNonNullAssertion": "off",
-                "noParameterAssign": "warn"
-            },
-            "suspicious": {
-                "noConfusingVoidType": "warn",
-                "noConsoleLog": "error",
-                "noDebugger": "error",
-                "noEmptyBlockStatements": "off",
-                "noEmptyInterface": "off",
-                "noExplicitAny": "error",
-                "noRedeclare": "off",
-                "noShadowRestrictedNames": "off",
-                "useAwait": "error"
-            }
-        }
+      "enabled": false
     },
-    "organizeImports": {
-        "enabled": true
-    },
-    "vcs": {
-        "clientKind": "git",
-        "defaultBranch": "develop",
-        "enabled": true,
-        "useIgnoreFile": true
+    "parser": {
+      "cssModules": true
     }
+  },
+  "files": {
+    "ignore": [
+      "**/*.js",
+      "**/*.mjs",
+      "**/*.cjs",
+      "**/*.d.ts",
+      "**/.output/**",
+      "**/.vinxi/**"
+    ],
+    "maxSize": 2097152
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 4,
+    "lineEnding": "lf",
+    "lineWidth": 140
+  },
+  "javascript": {
+    "formatter": {
+      "arrowParentheses": "asNeeded",
+      "bracketSameLine": true,
+      "quoteProperties": "asNeeded",
+      "quoteStyle": "single",
+      "trailingCommas": "none"
+    },
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    }
+  },
+  "json": {
+    "formatter": {
+      "indentStyle": "space"
+    },
+    "parser": {
+      "allowComments": true
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "complexity": {
+        "noBannedTypes": "warn",
+        "noForEach": "warn",
+        "noUselessSwitchCase": "off"
+      },
+      "correctness": {
+        "noUnusedImports": "error",
+        "noUnusedVariables": "error"
+      },
+      "style": {
+        "noInferrableTypes": "warn",
+        "noNamespace": "off",
+        "noNonNullAssertion": "off",
+        "noParameterAssign": "warn"
+      },
+      "suspicious": {
+        "noConfusingVoidType": "warn",
+        "noConsoleLog": "error",
+        "noDebugger": "error",
+        "noEmptyBlockStatements": "off",
+        "noEmptyInterface": "off",
+        "noExplicitAny": "error",
+        "noRedeclare": "off",
+        "noShadowRestrictedNames": "off",
+        "useAwait": "error"
+      },
+      "a11y": { "all": false }
+    }
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "vcs": {
+    "clientKind": "git",
+    "defaultBranch": "develop",
+    "enabled": true,
+    "useIgnoreFile": true
+  }
 }

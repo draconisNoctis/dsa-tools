@@ -1,0 +1,76 @@
+.Marker {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    opacity: 0.8;
+    gap: 4px;
+    top: calc(var(--y, 0) * 100%);
+    left: calc(var(--x, 0) * 100%);
+    color: var(--color);
+    border-radius: 4px;
+    transform: translate(-0.5em, -50%);
+    border: 1px solid transparent;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 0 4px #000000;
+
+    & span {
+        display: block;
+        font-weight: bold;
+        line-height: 1.1;
+    }
+
+    & input[type='color'] {
+        height: 1px;
+        width: 1px;
+        opacity: 0.0001;
+    }
+
+    & input[type='text'] {
+        width: 10rem;
+    }
+}
+
+.MarkerReverse {
+    flex-direction: row-reverse;
+    transform: translate(calc(-100% + 0.5em), -50%);
+}
+
+.MarkerEditing {
+    border-color: currentColor;
+    background: white;
+    opacity: 1;
+    padding: 4px;
+    transform: translate(calc(-0.5em - 4px), -50%);
+    pointer-events: auto;
+    &.MarkerReverse {
+      transform: translate(calc(-100% + 0.5em + 4px), -50%);
+  }
+}
+
+.MarkerDot {
+    height: 1em;
+    width: 1em;
+    background: currentColor;
+    border-radius: 50%;
+}
+
+.MarkerLayer {
+    pointer-events: none;
+
+    &.Active {
+        pointer-events: auto;
+    }
+}
+
+.Active {
+    & .Marker {
+        border-color: currentColor;
+        background: white;
+        opacity: 1;
+        padding: 4px;
+        transform: translate(calc(-0.5em - 4px), -50%);
+        &.MarkerReverse {
+            transform: translate(calc(-100% + 0.5em + 4px), -50%);
+        }
+    }
+}
