@@ -30,3 +30,7 @@ Thumbs.db
 
 /data
 /storage
+/.docker/data/*
+!/.docker/data/.keep
+/.docker/storage/*
+!/.docker/storage/.keep

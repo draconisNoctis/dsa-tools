@@ -23,16 +23,17 @@ export default eventHandler({
         async open(peer) {
             try {
                 console.info('[WS] open', peer.id);
-                const mapId = getIdFromUrl(peer.url);
+                const mapId = getIdFromPeer(peer);
                 const map = await MapDb.read(mapId);
                 peer.send(JSON.stringify({ type: 'update', update: map } satisfies UpdateEvent));
                 peer.subscribe(`map:${mapId}`);
             } catch (error) {
+                console.error(error);
                 peer.send(JSON.stringify({ type: 'error', error }));
             }
         },
         async message(peer, message) {
-            const mapId = getIdFromUrl(peer.url);
+            const mapId = getIdFromPeer(peer);
             try {
                 const event = Event.parse(JSON.parse(message.text()));
 
@@ -46,17 +47,17 @@ export default eventHandler({
                             update: await MapDb.update(mapId, event.update)
                         } satisfies UpdateEvent);
                         peer.publish(`map:${mapId}`, payload);
-                        // peer.send(payload);
                         break;
                     }
                 }
             } catch (error) {
+                console.error(error);
                 peer.send(JSON.stringify({ type: 'error', error }));
             }
         },
         close(peer) {
             console.info('[WS] close', peer.id);
-            const mapId = getIdFromUrl(peer.url);
+            const mapId = getIdFromPeer(peer);
             peer.unsubscribe(`map:${mapId}`);
         },
         error(peer, error) {
@@ -66,6 +67,7 @@ export default eventHandler({
     }
 });
 
-function getIdFromUrl(url: string): string {
-    return url.split(/\//).pop()!;
+function getIdFromPeer(peer: object): string {
+    const url = 'url' in peer && peer.url ? (peer.url as string) : 'request' in peer ? (peer.request as { url: string }).url : undefined;
+    return url!.split(/\//).pop()!;
 }

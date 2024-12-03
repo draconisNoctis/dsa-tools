@@ -1,0 +1,6 @@
+Dockerfile
+.vscode
+data
+node_modules
+storage
+.docker
