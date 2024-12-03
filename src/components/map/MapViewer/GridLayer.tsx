@@ -10,7 +10,7 @@ const DEFAULT_OFFSET_COLOR = '#374151';
 
 export const GridLayer: Component<{
     map?: Map;
-    preview?: boolean;
+    presenter?: boolean;
     onUpdate?: (update: MapUpdate) => void;
     onOptionsUpdate?: (options: NonNullable<MapUpdate['layerOptions']>['grid']) => void;
 }> = props => {
@@ -112,8 +112,8 @@ export const GridLayer: Component<{
                             <div
                                 class="border border-black border-r-0 border-b-0"
                                 style={{
-                                    '--grid-color': `${options()?.gridColor ?? DEFAULT_GRID_COLOR}${props.preview ? '' : 'E6'}`,
-                                    '--offset-color': `${options()?.offsetColor ?? DEFAULT_OFFSET_COLOR}${props.preview ? '' : 'E6'}`
+                                    '--grid-color': `${options()?.gridColor ?? DEFAULT_GRID_COLOR}${props.presenter ? '' : 'E6'}`,
+                                    '--offset-color': `${options()?.offsetColor ?? DEFAULT_OFFSET_COLOR}${props.presenter ? '' : 'E6'}`
                                 }}
                                 classList={{
                                     'bg-[var(--grid-color)]': !isOpened() && !isOffset(),

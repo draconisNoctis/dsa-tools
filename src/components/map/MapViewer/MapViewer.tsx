@@ -7,7 +7,7 @@ import { GridLayer } from './GridLayer';
 import { MarkerLayer } from './MarkerLayer';
 
 export interface MapViewerProps {
-    preview?: boolean;
+    presenter?: boolean;
     map?: Map;
     onUpdate?: (update: MapUpdate) => void;
 }
@@ -19,10 +19,10 @@ export const MapViewer: Component<MapViewerProps> = props => {
     const screenAspect = createMemo(() => windowSize.width / windowSize.height);
     const imageAspect = createMemo(() => (image() ? image()!.width / image()!.height : 0));
 
-    const className = createMemo(() => (props.preview ? (screenAspect() > imageAspect() ? 'h-[100vh]' : 'w-[100vw]') : 'w-[100%]'));
+    const className = createMemo(() => (props.presenter ? (screenAspect() > imageAspect() ? 'h-[100vh]' : 'w-[100vw]') : 'w-[100%]'));
 
     return (
-        <div class={` flex items-center justify-center bg-gray-500 w-100% ${props.preview ? 'h-[100vh]' : ''} overflow-hidden`}>
+        <div class={` flex items-center justify-center bg-gray-500 w-100% ${props.presenter ? 'h-[100vh]' : ''} overflow-hidden`}>
             <div
                 class={`relative ${className()} bg-cover`}
                 style={{
@@ -31,8 +31,8 @@ export const MapViewer: Component<MapViewerProps> = props => {
                 }}>
                 <GridLayer
                     map={props.map}
-                    preview={props.preview}
-                    onUpdate={props.preview ? undefined : props.onUpdate}
+                    presenter={props.presenter}
+                    onUpdate={props.presenter ? undefined : props.onUpdate}
                     onOptionsUpdate={options => {
                         props.onUpdate?.({
                             layerOptions: {
@@ -42,10 +42,10 @@ export const MapViewer: Component<MapViewerProps> = props => {
                         });
                     }}
                 />
-                <MarkerLayer map={props.map} onUpdate={props.preview ? undefined : props.onUpdate} />
+                <MarkerLayer map={props.map} onUpdate={props.presenter ? undefined : props.onUpdate} />
                 <DrawLayer
                     map={props.map}
-                    onUpdate={props.preview ? undefined : props.onUpdate}
+                    onUpdate={props.presenter ? undefined : props.onUpdate}
                     onOptionsUpdate={options => {
                         props.onUpdate?.({
                             layerOptions: {
@@ -57,7 +57,7 @@ export const MapViewer: Component<MapViewerProps> = props => {
                 />
                 <CursorLayer
                     map={props.map}
-                    onUpdate={props.preview ? undefined : props.onUpdate}
+                    onUpdate={props.presenter ? undefined : props.onUpdate}
                     onOptionsUpdate={options => {
                         props.onUpdate?.({
                             layerOptions: {

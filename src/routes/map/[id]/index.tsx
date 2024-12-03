@@ -38,8 +38,8 @@ export default function Map() {
                 </div>
                 <aside class="flex flex-col">
                     <MapLayerOptions map={map} />
-                    <a href={`/map/${params.id}/preview`} target="_blank" class="mt-auto">
-                        Preview
+                    <a href={`/map/${params.id}/presenter`} target="_blank" class="mt-auto">
+                        Presenter
                     </a>
                 </aside>
                 <MapDebug map={map} />

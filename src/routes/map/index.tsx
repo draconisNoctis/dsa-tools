@@ -64,10 +64,10 @@ export default function Map() {
                                                 Admin
                                             </a>
                                             <a
-                                                href={`/map/${map._id}/preview`}
+                                                href={`/map/${map._id}/presenter`}
                                                 target="_blank"
                                                 class="bg-gray-500 rounded text-gray-200 px-4 py-2 w-[100%] text-center">
-                                                Preview
+                                                Presenter
                                             </a>
                                         </div>
                                     </td>
