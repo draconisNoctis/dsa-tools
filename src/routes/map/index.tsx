@@ -1,14 +1,16 @@
 import { action } from '@solidjs/router';
 import { For, createResource } from 'solid-js';
+import Nav from '~/components/Nav';
+import type { NoDocumentMeta } from '~/server/utils/no-db';
 import type { MapCreate } from '../../server/databases/map.db';
 
-async function getMaps(): Promise<{ _id: string; name: string }[]> {
+async function getMaps(): Promise<(NoDocumentMeta & { name: string })[]> {
     'use server';
     const { MapDb } = await import('../../server/databases/map.db');
 
     const maps = await MapDb.list();
 
-    return maps.map(({ _id, name }) => ({ _id, name }));
+    return maps.map(({ _id, _created, _updated, name }) => ({ _id, _created, _updated, name }));
 }
 
 async function createMap(values: MapCreate) {
@@ -33,25 +35,41 @@ export default function Map() {
     );
 
     return (
-        <main class="text-center mx-auto text-gray-950 bg-gray-500 p-4 m-4">
-            <form ref={form} action={createMapAction} method="post">
-                <table class="table-fixed">
+        <main class="text-center mx-auto  bg-gray-900 min-h-[100vh]">
+            <Nav />
+            <form ref={form} action={createMapAction} method="post" class="mt-8">
+                <table class="table-fixed border-collapse w-full text-sm text-left bg-gradient-to-b from-gray-800 via-gray-600 to-gray-800">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>&nbsp</th>
+                            <th class="border-b border-gray-500 font-medium p-2 pl-8 pt-6 pb-3 text-gray-200 text-left w-[50%]">Name</th>
+                            <th class="border-b border-gray-500 font-medium p-2 pt-6 pb-3 text-gray-200 text-left">Created</th>
+                            <th class="border-b border-gray-500 font-medium p-2 pt-6 pb-3 text-gray-200 text-left">Updated</th>
+                            <th class="border-b border-gray-500 font-medium p-2 pr-8 pt-6 pb-3 text-gray-200 text-left">&nbsp</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="bg-gray-600">
                         <For each={maps()}>
                             {map => (
                                 <tr>
-                                    <td>
-                                        <a href={`/map/${map._id}`}>{map._id}</a>
-                                    </td>
-                                    <td>
+                                    <td class="border-b border-gray-500 p-2 pl-8 text-gray-200">
                                         <a href={`/map/${map._id}`}>{map.name}</a>
+                                    </td>
+                                    <td class="border-b border-gray-500 p-2 text-gray-200">{map._created}</td>
+                                    <td class="border-b border-gray-500 p-2 text-gray-200">{map._updated}</td>
+                                    <td class="border-b border-gray-500 p-2 pr-8 text-gray-200">
+                                        <div class="flex gap-2">
+                                            <a
+                                                href={`/map/${map._id}`}
+                                                class="bg-gray-500 rounded text-gray-200 px-4 py-2 w-[100%] text-center">
+                                                Admin
+                                            </a>
+                                            <a
+                                                href={`/map/${map._id}/preview`}
+                                                target="_blank"
+                                                class="bg-gray-500 rounded text-gray-200 px-4 py-2 w-[100%] text-center">
+                                                Preview
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             )}
@@ -59,12 +77,13 @@ export default function Map() {
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td>&nbsp;</td>
-                            <td>
-                                <input name="name" required />
+                            <td colspan="3" class="p-2 pl-8">
+                                <input name="name" required class="w-[100%] px-4 py-2 bg-gray-200 text-gray-800 rounded" />
                             </td>
-                            <td>
-                                <button type="submit">Create</button>
+                            <td class="p-2 pr-8">
+                                <button type="submit" class="bg-gray-500 rounded text-gray-200 px-4 py-2 w-[100%]">
+                                    Create
+                                </button>
                             </td>
                         </tr>
                     </tfoot>

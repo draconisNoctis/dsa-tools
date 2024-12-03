@@ -4,7 +4,7 @@ import path from 'node:path';
 import { glob } from 'glob';
 import type z from 'zod';
 
-export type NoDocumentMeta = { _id: string };
+export type NoDocumentMeta = { _id: string; _created: string; _updated?: string };
 
 export type CreateInput<T extends z.ZodRawShape> = z.infer<z.ZodObject<T>>;
 export type UpdateInput<T extends z.ZodRawShape> = Partial<z.infer<z.ZodObject<T>>>;
@@ -35,6 +35,7 @@ export class NoDb<T extends z.ZodRawShape> {
     async create(values: CreateInput<T>): Promise<NoDocument<T>> {
         const doc = {
             _id: randomUUID(),
+            _created: new Date().toISOString(),
             ...this.schema.parse(values)
         };
 
@@ -44,17 +45,15 @@ export class NoDb<T extends z.ZodRawShape> {
     }
 
     async read(id: string): Promise<NoDocument<T>> {
-        return {
-            _id: id,
-            ...JSON.parse(await fs.promises.readFile(path.join(this.#dir, `${id}.json`), 'utf-8'))
-        };
+        return JSON.parse(await fs.promises.readFile(path.join(this.#dir, `${id}.json`), 'utf-8'));
     }
 
     update(id: string, update: UpdateInput<T>): Promise<NoDocument<T>> {
         const doc = {
             _id: id,
             ...JSON.parse(fs.readFileSync(path.join(this.#dir, `${id}.json`), 'utf-8')),
-            ...this.partialSchema.parse(update)
+            ...this.partialSchema.parse(update),
+            _updated: new Date().toISOString()
         };
 
         fs.writeFileSync(path.join(this.#dir, `${doc._id}.json`), JSON.stringify(doc, null, 2));

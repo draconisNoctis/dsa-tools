@@ -12,7 +12,7 @@ const MapLayerOptions = clientOnly(() => import('~/components/map/MapViewer/MapL
 
 export default function Map() {
     const params = useParams<{ id: string }>();
-    const [map, { send, set }] = useWebSocket<Map>(`/ws/map/${params.id}`, { _id: '', name: '' }, event => {
+    const [map, { send, set }] = useWebSocket<Map>(`/ws/map/${params.id}`, { _id: '', _created: '', name: '' }, event => {
         const json = JSON.parse(event.data) as Event;
         switch (json.type) {
             case 'update':
@@ -31,13 +31,16 @@ export default function Map() {
 
     return (
         <MapViewerContext.Provider value={context}>
-            <main class="mx-auto text-gray-950 bg-gray-500 p-4 grid min-h-[100vh] grid-cols-[1fr_minmax(200px,max-content)] gap-2">
+            <main class="mx-auto text-gray-950 bg-gray-500 p-4 grid grid-cols-[1fr_minmax(200px,max-content)] gap-2">
                 <MapSettings onUpdate={update} map={map} />
                 <div>
                     <MapViewer map={map} onUpdate={update} />
                 </div>
-                <aside>
+                <aside class="flex flex-col">
                     <MapLayerOptions map={map} />
+                    <a href={`/map/${params.id}/preview`} target="_blank" class="mt-auto">
+                        Preview
+                    </a>
                 </aside>
                 <MapDebug map={map} />
             </main>
