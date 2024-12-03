@@ -1,5 +1,6 @@
 import { type Component, Index, Show } from 'solid-js';
 import type { DOMElement } from 'solid-js/jsx-runtime';
+import { Portal } from 'solid-js/web';
 import type { Map, MapUpdate } from '../../../server/databases/map.db';
 import { useMapViewerContext } from './MapViewerContext';
 import styles from './MarkerLayer.module.css';
@@ -77,38 +78,47 @@ export const MarkerLayer: Component<{ map?: Map; onUpdate?: (update: MapUpdate) 
     }
 
     return (
-        <div
-            class={'absolute top-0 left-0 right-0 bottom-0'}
-            classList={{
-                [styles.MarkerLayer]: true,
-                [styles.Active]: context.isActive()
-            }}
-            onClick={clickHandler}>
-            <Index each={props.map?.marker && [...Object.keys(props.map.marker)]}>
-                {id => (
-                    <Marker
-                        id={id()}
-                        marker={props.map!.marker![id()]!}
-                        onUpdate={update => {
-                            props.onUpdate?.({
-                                marker: {
-                                    ...props.map?.marker,
-                                    [id()]: {
-                                        ...props.map!.marker![id()]!,
-                                        ...update
+        <>
+            <Portal mount={context.getPortal()}>
+                <div class="grid grid-cols-[1fr_min-content_max-content] gap-1 p-1">
+                    <button type="button" class="col-start-2 col-span-2" onClick={() => props.onUpdate?.({ marker: {} })}>
+                        Clear
+                    </button>
+                </div>
+            </Portal>
+            <div
+                class={'absolute top-0 left-0 right-0 bottom-0'}
+                classList={{
+                    [styles.MarkerLayer]: true,
+                    [styles.Active]: context.isActive()
+                }}
+                onClick={clickHandler}>
+                <Index each={props.map?.marker && [...Object.keys(props.map.marker)]}>
+                    {id => (
+                        <Marker
+                            id={id()}
+                            marker={props.map!.marker![id()]!}
+                            onUpdate={update => {
+                                props.onUpdate?.({
+                                    marker: {
+                                        ...props.map?.marker,
+                                        [id()]: {
+                                            ...props.map!.marker![id()]!,
+                                            ...update
+                                        }
                                     }
-                                }
-                            });
-                        }}
-                        onDelete={() => {
-                            const { [id()]: _, ...marker } = props.map?.marker ?? {};
-                            props.onUpdate?.({
-                                marker
-                            });
-                        }}
-                    />
-                )}
-            </Index>
-        </div>
+                                });
+                            }}
+                            onDelete={() => {
+                                const { [id()]: _, ...marker } = props.map?.marker ?? {};
+                                props.onUpdate?.({
+                                    marker
+                                });
+                            }}
+                        />
+                    )}
+                </Index>
+            </div>
+        </>
     );
 };
