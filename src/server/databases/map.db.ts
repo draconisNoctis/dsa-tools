@@ -9,6 +9,25 @@ export const MapDb = new NoDb(
         name: z.string(),
         imageId: z.string().nullable().optional(),
         cells: z.record(z.string(), z.boolean().nullable().optional()).nullable().optional(),
+        lines: z
+            .record(
+                z.string(),
+                z
+                    .object({
+                        color: z.string(),
+                        size: z.number(),
+                        points: z.array(
+                            z.object({
+                                x: z.number().min(0).max(1),
+                                y: z.number().min(0).max(1)
+                            })
+                        )
+                    })
+                    .nullable()
+                    .optional()
+            )
+            .nullable()
+            .optional(),
         cursor: z
             .object({
                 x: z.number().min(0).max(1),
@@ -56,6 +75,13 @@ export const MapDb = new NoDb(
                     .nullable()
                     .optional(),
                 cursor: z
+                    .object({
+                        color: z.string().nullable().optional(),
+                        size: z.number().nullable().optional()
+                    })
+                    .nullable()
+                    .optional(),
+                draw: z
                     .object({
                         color: z.string().nullable().optional(),
                         size: z.number().nullable().optional()

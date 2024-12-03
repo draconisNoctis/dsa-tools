@@ -2,6 +2,7 @@ import { createWindowSize } from '@solid-primitives/resize-observer';
 import { type Component, createMemo, createResource } from 'solid-js';
 import type { Map, MapUpdate } from '../../../server/databases/map.db';
 import { CursorLayer } from './CursorLayer';
+import { DrawLayer } from './DrawLayer';
 import { GridLayer } from './GridLayer';
 import { MarkerLayer } from './MarkerLayer';
 
@@ -49,6 +50,18 @@ export const MapViewer: Component<MapViewerProps> = props => {
                     }}
                 />
                 <MarkerLayer map={props.map} onUpdate={props.preview ? undefined : props.onUpdate} />
+                <DrawLayer
+                    map={props.map}
+                    onUpdate={props.preview ? undefined : props.onUpdate}
+                    onOptionsUpdate={options => {
+                        props.onUpdate?.({
+                            layerOptions: {
+                                ...props.map?.layerOptions,
+                                draw: { ...props.map?.layerOptions?.draw, ...options }
+                            }
+                        });
+                    }}
+                />
                 <CursorLayer
                     map={props.map}
                     onUpdate={props.preview ? undefined : props.onUpdate}
