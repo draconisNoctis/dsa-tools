@@ -68,7 +68,7 @@ export default function Map() {
                                             <a
                                                 href={`/map/${map._id}`}
                                                 class="bg-gray-500 rounded text-gray-200 px-4 py-2 w-[100%] text-center">
-                                                Admin
+                                                GM
                                             </a>
                                             <a
                                                 href={`/map/${map._id}/presenter`}
