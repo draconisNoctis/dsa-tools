@@ -54,7 +54,7 @@ export const DrawLayer: Component<{
         for (const line of lines()) {
             if (!line || !line.points.length) return;
             ctx.lineWidth = line.size;
-            ctx.strokeStyle = line.color;
+            ctx.strokeStyle = `${line.color}88`;
             ctx.beginPath();
             ctx.moveTo(line.points[0].x * size.width, line.points[0].y * size.height);
             for (const point of line.points) {
