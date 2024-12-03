@@ -70,7 +70,7 @@ export const GridLayer: Component<{
                 classList={{ 'pointer-events-none': !context.isActive() }}
                 style={{
                     'grid-template-columns': `${(options()?.offset?.left ?? 0) * 0.1}% repeat(${options()?.size?.width ?? 0}, 1fr) ${(options()?.offset?.right ?? 0) * 0.1}%`,
-                    'grid-template-rows': `${(options()?.offset?.top ?? 0) * 0.1}%repeat(${options()?.size?.height ?? 0}, 1fr) ${(options()?.offset?.bottom ?? 0) * 0.1}%`
+                    'grid-template-rows': `${(options()?.offset?.top ?? 0) * 0.1}% repeat(${options()?.size?.height ?? 0}, 1fr) ${(options()?.offset?.bottom ?? 0) * 0.1}%`
                 }}>
                 <Index each={cells()}>
                     {cell => {
