@@ -11,7 +11,9 @@ const DEFAULT_OFFSET_COLOR = '#374151';
 export const GridLayer: Component<{
     map?: Map;
     preview?: boolean;
-    onCellClick?: (cell: { row: number; col: number }) => void;
+    // onCellClick?: (cell: { row: number; col: number }) => void;
+
+    onUpdate?: (update: MapUpdate) => void;
     onOptionsUpdate?: (options: NonNullable<MapUpdate['layerOptions']>['grid']) => void;
 }> = props => {
     const context = useMapViewerContext('Grid', { shortcut: 'g' });
@@ -63,6 +65,9 @@ export const GridLayer: Component<{
                     <div class="col-span-3">
                         <GridOffset offset={options()?.offset} onUpdate={offset => props.onOptionsUpdate?.({ offset })} />
                     </div>
+                    <button type="button" class="col-start-2 col-span-2" onClick={() => props.onUpdate?.({ cells: {} })}>
+                        Hide All
+                    </button>
                 </div>
             </Portal>
             <div
@@ -93,7 +98,18 @@ export const GridLayer: Component<{
                                     'bg-[var(--grid-color)]': !isOpened() && !isOffset(),
                                     'bg-[var(--offset-color)]': isOffset()
                                 }}
-                                onClick={isOffset() ? undefined : () => props.onCellClick?.(cell())}
+                                onClick={
+                                    isOffset()
+                                        ? undefined
+                                        : () =>
+                                              props.onUpdate?.({
+                                                  cells: {
+                                                      ...props.map?.cells,
+                                                      [`${cell().row}:${cell().col}`]:
+                                                          !props.map?.cells?.[`${cell().row}:${cell().col}`] || undefined
+                                                  }
+                                              })
+                                }
                             />
                         );
                     }}

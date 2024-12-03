@@ -32,14 +32,7 @@ export const MapViewer: Component<MapViewerProps> = props => {
                 <GridLayer
                     map={props.map}
                     preview={props.preview}
-                    onCellClick={cell => {
-                        props.onUpdate?.({
-                            cells: {
-                                ...props.map?.cells,
-                                [`${cell.row}:${cell.col}`]: !props.map?.cells?.[`${cell.row}:${cell.col}`] || undefined
-                            }
-                        });
-                    }}
+                    onUpdate={props.preview ? undefined : props.onUpdate}
                     onOptionsUpdate={options => {
                         props.onUpdate?.({
                             layerOptions: {
