@@ -1,5 +1,7 @@
 import { useParams } from '@solidjs/router';
 import { clientOnly } from '@solidjs/start';
+import Breadcrumb from '~/components/Breadcrumb';
+import Nav from '~/components/Nav';
 import { MapDebug } from '~/components/map/MapViewer/MapDebug';
 import { MapSettings } from '~/components/map/MapViewer/MapSettings';
 import { MapViewer } from '~/components/map/MapViewer/MapViewer';
@@ -31,18 +33,28 @@ export default function Map() {
 
     return (
         <MapViewerContext.Provider value={context}>
-            <main class="mx-auto text-gray-950 bg-gray-500 p-4 grid grid-cols-[1fr_minmax(200px,max-content)] gap-2">
-                <MapSettings onUpdate={update} map={map} />
-                <div>
-                    <MapViewer map={map} onUpdate={update} />
+            <main class="bg-gray-900 min-h-[100vh]">
+                <Nav />
+                <Breadcrumb
+                    items={[
+                        ['Home', '/'],
+                        ['Maps', '/map'],
+                        [map.name, `/map/${map._id}`]
+                    ]}
+                />
+                <div class="mx-auto text-gray-950 bg-gray-500 p-4 grid grid-cols-[1fr_minmax(200px,max-content)] gap-2">
+                    <MapSettings onUpdate={update} map={map} />
+                    <div>
+                        <MapViewer map={map} onUpdate={update} />
+                    </div>
+                    <aside class="flex flex-col">
+                        <MapLayerOptions map={map} />
+                        <a href={`/map/${params.id}/presenter`} target="_blank" class="mt-auto">
+                            Presenter
+                        </a>
+                    </aside>
+                    <MapDebug map={map} />
                 </div>
-                <aside class="flex flex-col">
-                    <MapLayerOptions map={map} />
-                    <a href={`/map/${params.id}/presenter`} target="_blank" class="mt-auto">
-                        Presenter
-                    </a>
-                </aside>
-                <MapDebug map={map} />
             </main>
         </MapViewerContext.Provider>
     );

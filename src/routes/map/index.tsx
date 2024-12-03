@@ -1,5 +1,6 @@
 import { action } from '@solidjs/router';
 import { For, createResource } from 'solid-js';
+import Breadcrumb from '~/components/Breadcrumb';
 import Nav from '~/components/Nav';
 import type { NoDocumentMeta } from '~/server/utils/no-db';
 import type { MapCreate } from '../../server/databases/map.db';
@@ -35,9 +36,15 @@ export default function Map() {
     );
 
     return (
-        <main class="text-center mx-auto  bg-gray-900 min-h-[100vh]">
+        <main class="bg-gray-900 min-h-[100vh]">
             <Nav />
-            <form ref={form} action={createMapAction} method="post" class="mt-8">
+            <Breadcrumb
+                items={[
+                    ['Home', '/'],
+                    ['Maps', '/map']
+                ]}
+            />
+            <form ref={form} action={createMapAction} method="post" class="mt-4">
                 <table class="table-fixed border-collapse w-full text-sm text-left bg-gradient-to-b from-gray-800 via-gray-600 to-gray-800">
                     <thead>
                         <tr>
