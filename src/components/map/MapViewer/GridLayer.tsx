@@ -1,5 +1,5 @@
-import { type Component, Index, createMemo } from 'solid-js';
-import { Portal } from 'solid-js/web';
+import { type Component, Index, createMemo, createSignal, onCleanup, onMount } from 'solid-js';
+import { Portal, isServer } from 'solid-js/web';
 import type { Map, MapUpdate } from '../../../server/databases/map.db';
 import { GridOffset } from './GridOffset';
 import { GridSize } from './GridSize';
@@ -11,14 +11,35 @@ const DEFAULT_OFFSET_COLOR = '#374151';
 export const GridLayer: Component<{
     map?: Map;
     preview?: boolean;
-    // onCellClick?: (cell: { row: number; col: number }) => void;
-
     onUpdate?: (update: MapUpdate) => void;
     onOptionsUpdate?: (options: NonNullable<MapUpdate['layerOptions']>['grid']) => void;
 }> = props => {
     const context = useMapViewerContext('Grid', { shortcut: 'g' });
+    const [isShifting, setShifting] = createSignal(false);
 
     const options = createMemo(() => props.map?.layerOptions?.grid);
+
+    function keydownEvent(event: KeyboardEvent) {
+        if (event.shiftKey) {
+            setShifting(true);
+        }
+    }
+    function keyupEvent(event: KeyboardEvent) {
+        if (!event.shiftKey) {
+            setShifting(false);
+        }
+    }
+
+    if (!isServer) {
+        onMount(() => {
+            window.addEventListener('keydown', keydownEvent);
+            window.addEventListener('keyup', keyupEvent);
+        });
+        onCleanup(() => {
+            window.removeEventListener('keydown', keydownEvent);
+            window.removeEventListener('keyup', keyupEvent);
+        });
+    }
 
     const cells = createMemo(() =>
         options()?.size?.height && options()?.size?.width
@@ -97,6 +118,16 @@ export const GridLayer: Component<{
                                 classList={{
                                     'bg-[var(--grid-color)]': !isOpened() && !isOffset(),
                                     'bg-[var(--offset-color)]': isOffset()
+                                }}
+                                onMouseOver={() => {
+                                    if (isShifting()) {
+                                        props.onUpdate?.({
+                                            cells: {
+                                                ...props.map?.cells,
+                                                [`${cell().row}:${cell().col}`]: true
+                                            }
+                                        });
+                                    }
                                 }}
                                 onClick={
                                     isOffset()
