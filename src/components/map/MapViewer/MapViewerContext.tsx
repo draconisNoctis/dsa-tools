@@ -1,9 +1,12 @@
-import { createContext, onCleanup, useContext } from 'solid-js';
+import { makePersisted } from '@solid-primitives/storage';
+import { createContext, createSignal, onCleanup, useContext } from 'solid-js';
 import { createStore } from 'solid-js/store';
 import { isServer } from 'solid-js/web';
 
 export class MapViewerCtx {
-    #store = createStore<{ layer: Map<string, { node: Node; options?: IMapViewContextOptions }>; activeLayer?: string }>({
+    #activeLayer = makePersisted(createSignal<string>());
+
+    #store = createStore<{ layer: Map<string, { node: Node; options?: IMapViewContextOptions }> }>({
         layer: new Map()
     });
 
@@ -16,17 +19,19 @@ export class MapViewerCtx {
     }
 
     isActive(name: string) {
-        return name === this.#store[0].activeLayer;
+        return name === this.#activeLayer[0]();
     }
 
     setActive(name: string) {
-        this.#store[1]({ activeLayer: name });
+        this.#activeLayer[1](name);
     }
 
     registerLayer(name: string, options?: IMapViewContextOptions): void {
         if (isServer) return;
+        if (!this.#activeLayer[0]()) {
+            this.#activeLayer[1](name);
+        }
         this.#store[1](store => ({
-            activeLayer: store.activeLayer ?? name,
             layer: new Map([...store.layer, [name, { node: document.createElement('div'), options }]])
         }));
     }

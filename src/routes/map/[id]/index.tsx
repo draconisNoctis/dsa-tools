@@ -42,7 +42,7 @@ export default function Map() {
                         [map.name, `/map/${map._id}`]
                     ]}
                 />
-                <div class="mx-auto text-gray-950 bg-gray-500 p-4 grid grid-cols-[1fr_minmax(200px,max-content)] gap-2">
+                <div class="mx-auto text-gray-950 bg-gray-500 p-4 grid grid-cols-[1fr_200px] gap-2">
                     <MapSettings onUpdate={update} map={map} />
                     <div>
                         <MapViewer map={map} onUpdate={update} />

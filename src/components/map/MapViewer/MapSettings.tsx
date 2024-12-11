@@ -14,9 +14,10 @@ export const MapSettings: Component<MapSettingsProps> = props => {
     return (
         <>
             <Portal mount={context.getPortal()}>
-                <div class="grid grid-cols-[1fr_max-content] gap-1 p-1">
+                <div class="grid grid-cols-[max-content_1fr] gap-1 p-1">
                     <label for="settings-name">Name</label>
                     <input
+                        class="w-[100%]"
                         type="text"
                         id="settings-name"
                         value={props.map?.name}

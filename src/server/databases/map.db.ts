@@ -9,22 +9,25 @@ export const MapDb = new NoDb(
         name: z.string(),
         imageId: z.string().nullable().optional(),
         cells: z.record(z.string(), z.boolean().nullable().optional()).nullable().optional(),
-        lines: z
+        layers: z
             .record(
                 z.string(),
-                z
-                    .object({
-                        color: z.string(),
-                        size: z.number(),
-                        points: z.array(
-                            z.object({
-                                x: z.number().min(0).max(1),
-                                y: z.number().min(0).max(1)
-                            })
-                        )
-                    })
-                    .nullable()
-                    .optional()
+                z.object({
+                    name: z.string().nullable().optional(),
+                    lines: z.record(
+                        z.string(),
+                        z.object({
+                            color: z.string(),
+                            size: z.number(),
+                            points: z.array(
+                                z.object({
+                                    x: z.number().min(0).max(1),
+                                    y: z.number().min(0).max(1)
+                                })
+                            )
+                        })
+                    )
+                })
             )
             .nullable()
             .optional(),

@@ -9,9 +9,9 @@
         display: block;
         background: #00ffffaa;
         background: color-mix(in srgb, var(--cursor-color), transparent 30%);
-        height: calc(var(--cursor-size) / 2 * 0.05vw);
-        width: calc(var(--cursor-size) / 2 * 0.05vw);
-        box-shadow: 0 0 calc(var(--cursor-size) / 1 * 0.05vw) calc(var(--cursor-size) / 2 * 0.05vw)
+        height: calc(var(--cursor-size) / 2 * 0.05cqw);
+        width: calc(var(--cursor-size) / 2 * 0.05cqw);
+        box-shadow: 0 0 calc(var(--cursor-size) / 1 * 0.05cqw) calc(var(--cursor-size) / 2 * 0.05cqw)
             color-mix(in srgb, var(--cursor-color), transparent 30%);
         border-radius: 50%;
         position: absolute;
