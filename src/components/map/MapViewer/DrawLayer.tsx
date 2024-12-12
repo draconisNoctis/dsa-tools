@@ -89,6 +89,16 @@ export const DrawLayer: Component<{
     });
 
     createEffect(() => {
+        if (context.isActive()) {
+            const layers = untrack(() => props.map?.layers);
+            const firstLayerId = Object.keys(layers ?? {}).shift();
+            if (!untrack(currentLayerId) && firstLayerId) {
+                setCurrentLayerId(firstLayerId);
+            }
+        }
+    });
+
+    createEffect(() => {
         const line = currentLine();
         if (!line) return;
         props.onUpdate?.({
