@@ -14,9 +14,27 @@ export function useWebSocket<T extends {}>(
     }
     const wsUrl = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}${path}`;
 
-    const ws = new WebSocket(wsUrl);
+    const messageQueue: (string | ArrayBufferLike | Blob | ArrayBufferView)[] = [];
+    let errorCount = 0;
+    let ws: WebSocket;
 
-    ws.addEventListener('message', event => setStore(fn(event)));
+    function create() {
+        ws = new WebSocket(wsUrl);
+        ws.addEventListener('message', event => setStore(fn(event)));
+        ws.addEventListener('open', () => {
+            for (const message of messageQueue) {
+                ws.send(message);
+            }
+            messageQueue.length = 0;
+        });
+        ws.addEventListener('error', err => {
+            console.error(err);
+            ++errorCount;
+            setTimeout(create, Math.min(60_000, errorCount ** Math.SQRT2 * 1000));
+        });
+    }
+
+    create();
 
     onCleanup(() => {
         if (ws.readyState !== ws.CLOSED && ws.readyState !== ws.CLOSING) {
@@ -27,9 +45,11 @@ export function useWebSocket<T extends {}>(
     return [
         store,
         {
-            send: (val: string | ArrayBuffer | Blob | ArrayBufferView) => {
+            send: (message: string | ArrayBuffer | Blob | ArrayBufferView) => {
                 if (ws.readyState === ws.OPEN) {
-                    ws.send(val);
+                    ws.send(message);
+                } else {
+                    messageQueue.push(message);
                 }
             },
             set: setStore
