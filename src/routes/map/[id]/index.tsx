@@ -9,13 +9,13 @@ import { MapViewer } from '~/components/map/MapViewer/MapViewer';
 import { MapViewerContext, MapViewerCtx } from '~/components/map/MapViewer/MapViewerContext';
 import { useWebSocket } from '~/hooks/useWebSocket';
 import type { Map, MapUpdate } from '../../../server/databases/map.db';
-import type { Event, PingEvent, UpdateEvent } from '../../../server/ws/map';
+import type { Event, PingEvent, PresentEvent, ReadEvent, UpdateEvent } from '../../../server/ws/map';
 
 const MapLayerOptions = clientOnly(() => import('~/components/map/MapViewer/MapLayerOptions'));
 
 export default function Map() {
     const params = useParams<{ id: string }>();
-    const [map, { send, set, reconnect }] = useWebSocket<Map>(`/ws/map/${params.id}`, { _id: '', _created: '', name: '' }, event => {
+    const [map, { send, set, reconnect }] = useWebSocket<Map>('/ws/map', { _id: '', _created: '', name: '' }, event => {
         const json = JSON.parse(event.data) as Event;
         switch (json.type) {
             case 'update':
@@ -27,6 +27,8 @@ export default function Map() {
                 return {};
         }
     });
+
+    send(JSON.stringify({ type: 'read', id: params.id } satisfies ReadEvent));
 
     let reconnectTimeout: ReturnType<typeof setTimeout> | undefined;
     function resetReconnectTimer() {
@@ -42,7 +44,7 @@ export default function Map() {
 
     function update(update: MapUpdate) {
         set(update);
-        send(JSON.stringify({ type: 'update', update } satisfies UpdateEvent));
+        send(JSON.stringify({ type: 'update', id: params.id, update } satisfies UpdateEvent));
     }
 
     const context = new MapViewerCtx();
@@ -67,6 +69,9 @@ export default function Map() {
                         <MapLayerOptions map={map} />
                         <a href={`/map/${params.id}/presenter`} target="_blank" class="mt-auto">
                             Presenter
+                        </a>
+                        <a onClick={() => send(JSON.stringify({ type: 'present', id: params.id } satisfies PresentEvent))} target="_blank">
+                            Present this
                         </a>
                     </aside>
                     <MapDebug map={map} />

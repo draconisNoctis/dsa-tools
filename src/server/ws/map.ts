@@ -10,9 +10,22 @@ export type CreateEvent = z.infer<typeof CreateEvent>;
 
 const UpdateEvent = z.object({
     type: z.enum(['update']),
+    id: z.string(),
     update: MapDb.partialSchema
 });
 export type UpdateEvent = z.infer<typeof UpdateEvent>;
+
+const ReadEvent = z.object({
+    type: z.enum(['read']),
+    id: z.string()
+});
+export type ReadEvent = z.infer<typeof ReadEvent>;
+
+const SubscribeEvent = z.object({
+    type: z.enum(['subscribe']),
+    id: z.string()
+});
+export type SubscribeEvent = z.infer<typeof SubscribeEvent>;
 
 const PingEvent = z.object({
     type: z.enum(['ping'])
@@ -24,26 +37,30 @@ const PongEvent = z.object({
 });
 export type PongEvent = z.infer<typeof PongEvent>;
 
-const Event = z.union([CreateEvent, UpdateEvent, PingEvent, PongEvent]);
+const PresentEvent = z.object({
+    type: z.enum(['present']),
+    id: z.string()
+});
+export type PresentEvent = z.infer<typeof PresentEvent>;
+
+const Event = z.union([CreateEvent, UpdateEvent, ReadEvent, SubscribeEvent, PingEvent, PongEvent, PresentEvent]);
 export type Event = z.infer<typeof Event>;
+
+const PEER_TO_TOPIC = new WeakMap<object, string>();
 
 export default eventHandler({
     handler() {},
     websocket: {
-        async open(peer) {
+        open(peer) {
             try {
                 console.info('[WS] open', peer.id);
-                const mapId = getIdFromPeer(peer);
-                const map = await MapDb.read(mapId);
-                peer.send(JSON.stringify({ type: 'update', update: map } satisfies UpdateEvent));
-                peer.subscribe(`map:${mapId}`);
+                peer.subscribe('presenter');
             } catch (error) {
                 console.error(error);
                 peer.send(JSON.stringify({ type: 'error', error }));
             }
         },
         async message(peer, message) {
-            const mapId = getIdFromPeer(peer);
             try {
                 const event = Event.parse(JSON.parse(message.text()));
 
@@ -51,15 +68,30 @@ export default eventHandler({
                     case 'ping':
                         peer.send(JSON.stringify({ type: 'pong' }));
                         break;
+                    case 'present':
+                        peer.publish('presenter', JSON.stringify(event));
+                        break;
+                    // biome-ignore lint/suspicious/noFallthroughSwitchClause: explicit
+                    case 'subscribe': {
+                        if (PEER_TO_TOPIC.has(peer)) peer.unsubscribe(PEER_TO_TOPIC.get(peer)!);
+                        PEER_TO_TOPIC.set(peer, `map:${event.id}`);
+                        peer.subscribe(`map:${event.id}`);
+                    }
+                    case 'read': {
+                        const map = await MapDb.read(event.id);
+                        peer.send(JSON.stringify({ type: 'update', id: event.id, update: map } satisfies UpdateEvent));
+                        break;
+                    }
                     case 'create':
                         // do nothing;
                         break;
                     case 'update': {
                         const payload = JSON.stringify({
                             type: 'update',
-                            update: await MapDb.update(mapId, event.update)
+                            id: event.id,
+                            update: await MapDb.update(event.id, event.update)
                         } satisfies UpdateEvent);
-                        peer.publish(`map:${mapId}`, payload);
+                        peer.publish(`map:${event.id}`, payload);
                         break;
                     }
                 }
@@ -70,8 +102,8 @@ export default eventHandler({
         },
         close(peer) {
             console.info('[WS] close', peer.id);
-            const mapId = getIdFromPeer(peer);
-            peer.unsubscribe(`map:${mapId}`);
+            peer.unsubscribe('presenter');
+            if (PEER_TO_TOPIC.has(peer)) peer.unsubscribe(PEER_TO_TOPIC.get(peer)!);
         },
         error(peer, error) {
             console.info('[WS] open', peer.id, error);
@@ -79,8 +111,3 @@ export default eventHandler({
         }
     }
 });
-
-function getIdFromPeer(peer: object): string {
-    const url = 'url' in peer && peer.url ? (peer.url as string) : 'request' in peer ? (peer.request as { url: string }).url : undefined;
-    return url!.split(/\//).pop()!;
-}
