@@ -6,15 +6,25 @@ const CreateEvent = z.object({
     type: z.enum(['create']),
     values: MapDb.schema
 });
-
 export type CreateEvent = z.infer<typeof CreateEvent>;
+
 const UpdateEvent = z.object({
     type: z.enum(['update']),
     update: MapDb.partialSchema
 });
 export type UpdateEvent = z.infer<typeof UpdateEvent>;
 
-const Event = z.union([CreateEvent, UpdateEvent]);
+const PingEvent = z.object({
+    type: z.enum(['ping'])
+});
+export type PingEvent = z.infer<typeof PingEvent>;
+
+const PongEvent = z.object({
+    type: z.enum(['pong'])
+});
+export type PongEvent = z.infer<typeof PongEvent>;
+
+const Event = z.union([CreateEvent, UpdateEvent, PingEvent, PongEvent]);
 export type Event = z.infer<typeof Event>;
 
 export default eventHandler({
@@ -38,6 +48,9 @@ export default eventHandler({
                 const event = Event.parse(JSON.parse(message.text()));
 
                 switch (event.type) {
+                    case 'ping':
+                        peer.send(JSON.stringify({ type: 'pong' }));
+                        break;
                     case 'create':
                         // do nothing;
                         break;

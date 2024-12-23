@@ -1,5 +1,6 @@
 import { useParams } from '@solidjs/router';
 import { clientOnly } from '@solidjs/start';
+import { isServer } from 'solid-js/web';
 import Breadcrumb from '~/components/Breadcrumb';
 import Nav from '~/components/Nav';
 import { MapDebug } from '~/components/map/MapViewer/MapDebug';
@@ -8,21 +9,36 @@ import { MapViewer } from '~/components/map/MapViewer/MapViewer';
 import { MapViewerContext, MapViewerCtx } from '~/components/map/MapViewer/MapViewerContext';
 import { useWebSocket } from '~/hooks/useWebSocket';
 import type { Map, MapUpdate } from '../../../server/databases/map.db';
-import type { Event, UpdateEvent } from '../../../server/ws/map';
+import type { Event, PingEvent, UpdateEvent } from '../../../server/ws/map';
 
 const MapLayerOptions = clientOnly(() => import('~/components/map/MapViewer/MapLayerOptions'));
 
 export default function Map() {
     const params = useParams<{ id: string }>();
-    const [map, { send, set }] = useWebSocket<Map>(`/ws/map/${params.id}`, { _id: '', _created: '', name: '' }, event => {
+    const [map, { send, set, reconnect }] = useWebSocket<Map>(`/ws/map/${params.id}`, { _id: '', _created: '', name: '' }, event => {
         const json = JSON.parse(event.data) as Event;
         switch (json.type) {
             case 'update':
                 return json.update;
+            // biome-ignore lint/suspicious/noFallthroughSwitchClause: explicit
+            case 'pong':
+                resetReconnectTimer();
             default:
                 return {};
         }
     });
+
+    let reconnectTimeout: ReturnType<typeof setTimeout> | undefined;
+    function resetReconnectTimer() {
+        if (reconnectTimeout != null) clearTimeout(reconnectTimeout);
+        reconnectTimeout = setTimeout(reconnect, 10_000);
+    }
+
+    if (!isServer) {
+        setInterval(() => {
+            send(JSON.stringify({ type: 'ping' } satisfies PingEvent));
+        }, 5_000);
+    }
 
     function update(update: MapUpdate) {
         set(update);

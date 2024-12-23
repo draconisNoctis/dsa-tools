@@ -6,11 +6,14 @@ export function useWebSocket<T extends {}>(
     path: string,
     initialValue: T,
     fn: (event: MessageEvent) => StoreSetter<T>
-): [store: Store<T>, { send: (val: string | ArrayBuffer | Blob | ArrayBufferView) => void; set: SetStoreFunction<T> }] {
+): [
+    store: Store<T>,
+    { send: (val: string | ArrayBuffer | Blob | ArrayBufferView) => void; set: SetStoreFunction<T>; reconnect: () => void }
+] {
     const [store, setStore] = createStore<T>(initialValue);
 
     if (isServer) {
-        return [initialValue, { send: () => {}, set: setStore }];
+        return [initialValue, { send: () => {}, set: setStore, reconnect: () => {} }];
     }
     const wsUrl = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}${path}`;
 
@@ -18,7 +21,10 @@ export function useWebSocket<T extends {}>(
     let errorCount = 0;
     let ws: WebSocket;
 
-    function create() {
+    function connect() {
+        try {
+            if (ws) ws.close();
+        } catch {}
         ws = new WebSocket(wsUrl);
         ws.addEventListener('message', event => setStore(fn(event)));
         ws.addEventListener('open', () => {
@@ -30,11 +36,11 @@ export function useWebSocket<T extends {}>(
         ws.addEventListener('error', err => {
             console.error(err);
             ++errorCount;
-            setTimeout(create, Math.min(60_000, errorCount ** Math.SQRT2 * 1000));
+            setTimeout(connect, Math.min(60_000, errorCount ** Math.SQRT2 * 1000));
         });
     }
 
-    create();
+    connect();
 
     onCleanup(() => {
         if (ws.readyState !== ws.CLOSED && ws.readyState !== ws.CLOSING) {
@@ -52,7 +58,11 @@ export function useWebSocket<T extends {}>(
                     messageQueue.push(message);
                 }
             },
-            set: setStore
+            set: setStore,
+            reconnect: () => {
+                errorCount = 0;
+                connect();
+            }
         }
     ];
 }
